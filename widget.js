@@ -4,7 +4,7 @@ const chatInput       = document.querySelector(".chat-input textarea");
 const sendChatBtn     = document.querySelector(".chat-input span");
 const chatBotCloseBtn = document.querySelector(".close-btn");
 
-const inputInitHeight = chatInput.scrollHeight === null ? 0 : chatInput.scrollHeight ;
+const inputInitHeight = chatInput.scrollHeight === null ? 0 : chatInput.scrollHeight;
 
 
 
