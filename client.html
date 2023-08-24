@@ -19,13 +19,12 @@
                 return response.text()
             }).then(data=>{
                 document.body.insertAdjacentHTML( 'beforeend', data );
+                var script = document.createElement('script');
+                script.src = "https://rynhan.github.io/DEMI-AI-widget/widget.js";
+                script.async = true;
+                script.defer = true;
+                document.getElementsByTagName('head')[0].appendChild(script);
             })
-
-            var script = document.createElement('script');
-            script.src = "https://rynhan.github.io/DEMI-AI-widget/widget.js";
-            script.async = true;
-            script.defer = true;
-            document.getElementsByTagName('head')[0].appendChild(script);
 
         })()
     </script>
