@@ -1,3 +1,17 @@
+(function() {
+    var style = document.createElement('link');
+    style.type = 'text/css';
+    style.rel = 'stylesheet';
+    style.href = "https://rynhan.github.io/DEMI-AI-widget/widget.css"
+    document.getElementsByTagName('head')[0].appendChild(style);
+
+    fetch('https://rynhan.github.io/DEMI-AI-widget/widget.html').then(response => {  
+        return response.text()
+    }).then(data=>{
+        document.body.insertAdjacentHTML( 'beforeend', data );
+    })
+})()
+
 const chatbotToggle   = document.querySelector(".chatbot-toggler");
 const chatBox         = document.querySelector(".chatbox");
 const chatInput       = document.querySelector(".chat-input textarea");
