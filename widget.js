@@ -30,7 +30,7 @@ function toHyperlink(txt) { // to find URLs within the string and convert them i
 }
 
 // Default bot image URL, replace this with the actual URL of your bot's image
-const botImageUrl = "https://raw.githubusercontent.com/rynhan/DEMI-AI-widget/main/D3.png";
+const botImageUrl = "https://rynhan.github.io/DEMI-AI-widget/D3.js";
 const createChatLi = (message, className, imageUrl = botImageUrl) => {
     const chatLi = document.createElement("li");
     chatLi.classList.add("chat", className);
