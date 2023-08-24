@@ -92,7 +92,7 @@ const handleChat = () => {
     // https://platform.openai.com/docs/api-reference/chat
     console.log("Calling gpt-3.5-turbo-16k")
     // var url = "http://localhost:6600/chat";
-    var url = "https://relieved-top-coat-toad.cyclic.cloud/chat";
+    var url = "https://talented-puce-ostrich.cyclic.cloud/chat";
     fetch(url, {
         method: 'POST',
         headers: {
