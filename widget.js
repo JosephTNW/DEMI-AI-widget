@@ -71,26 +71,12 @@ let userMessage; // a container where we will put the clean message here (trimme
 var chatHistory = []; // all of the chat history are stored here
 
 
-
-
-const handleChat = () => {
-    // Clean the user input
-    userMessage = chatInput.value.trim(); // removes whitespace from both sides (right and left) of an input string and stored in userMessage var
-    if(!userMessage) return; // if the userMessage contains nothing, nothing will happen
-
-    // Sanitize user input to prevent rendering HTML tags.
-    const sanitizedUserMessage = sanitizeUserMessage(userMessage);
-
-    //Append user message to chatbox
-    chatBox.appendChild(createChatLi(sanitizedUserMessage, "outgoing")); // append chatBox ul with new li message from user 
-    chatBox.scrollTo(0, chatBox.scrollHeight); // scroll down
-    chatHistory.push( {role:'user', content: sanitizedUserMessage} ) // push the previous user chat into chatHistory
-
-    console.log(chatHistory);
-
-    // Summoning gpt-3.5-turbo-16k or whatever
+const generateResponse = (incomingChatLi) => {
+  // Summoning gpt-3.5-turbo-16k or whatever
     // https://platform.openai.com/docs/api-reference/chat
     console.log("Calling gpt-3.5-turbo-16k")
+
+    const messageElement = incomingChatLi.querySelector("p");
     // var url = "http://localhost:6600/chat";
     var url = "https://talented-puce-ostrich.cyclic.cloud/chat";
     fetch(url, {
@@ -106,12 +92,38 @@ const handleChat = () => {
     }).then(data=>{
         console.log(data.choices[0].message.content) // all the json data are here
         console.log(data.choices[0].message) // only the message
-        chatBox.appendChild(createChatLi(data.choices[0].message.content, "incoming")) // append chatBox ul with new li message from assistant 
+      messageElement.textContent = data.choices[0].message.content; // append chatBox ul with new li message from assistant
         chatBox.scrollTo(0, chatBox.scrollHeight); // scroll down
         chatHistory.push(data.choices[0].message) // push the previous assistant chat into chatHistory
     }).catch(error => {
         console.log('Something bad happened ' + error)
     });
+};
+
+const handleChat = () => {
+    // Clean the user input
+    userMessage = chatInput.value.trim(); // removes whitespace from both sides (right and left) of an input string and stored in userMessage var
+    if(!userMessage) return; // if the userMessage contains nothing, nothing will happen
+
+    // Sanitize user input to prevent rendering HTML tags.
+    const sanitizedUserMessage = sanitizeUserMessage(userMessage);
+
+    //Append user message to chatbox
+    chatBox.appendChild(createChatLi(sanitizedUserMessage, "outgoing")); // append chatBox ul with new li message from user 
+    chatBox.scrollTo(0, chatBox.scrollHeight); // scroll down
+
+    setTimeout(() => {
+    //Display "Thinking..." message while waiting for the response
+    const incomingChatLi = createChatLi("Thinking", "incoming")
+    chatBox.appendChild(incomingChatLi);
+    generateResponse(incomingChatLi)
+  }, 600);
+    
+    chatHistory.push( {role:'user', content: sanitizedUserMessage} ) // push the previous user chat into chatHistory
+
+    console.log(chatHistory);
+
+    generateResponse()
     
     chatInput.value = ""; // always make sure the input text is empty to type
 
