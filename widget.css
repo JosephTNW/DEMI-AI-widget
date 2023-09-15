@@ -288,13 +288,24 @@
     visibility: visible;
 }
 
+.thinking p {
+    background-image: linear-gradient(90deg, #8a8a8a, #bdbdbd, #8a8a8a) !important;
+    background-size: 400% 400% !important;
+    color: transparent !important;
+    -webkit-background-clip: text !important;
+    background-clip: text;
+    font-weight: 700;
+    animation: gradientChange 5s linear infinite;
+}
 
-
-
-
-
-
-
+@keyframes gradientChange {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 400% 400%;
+    }
+}
 
 @media(max-width: 490px) {
     .chatbot {
