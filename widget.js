@@ -32,25 +32,33 @@ function toHyperlink(txt) { // to find URLs within the string and convert them i
 // Default bot image URL, replace this with the actual URL of your bot's image
 const botImageUrl = "https://rynhan.github.io/DEMI-AI-widget/D3.png";
 const createChatLi = (message, className, imageUrl = botImageUrl) => {
-    const chatLi = document.createElement("li");
+  const chatLi = document.createElement("li");
+
+  if (Array.isArray(className)) {
+    className.forEach((className) => {
+      chatLi.classList.add("chat", className);
+    });
+  } else {
     chatLi.classList.add("chat", className);
+  }
 
-    if (className === "incoming") {
-        if (imageUrl) {
-            const image = document.createElement("img");
-            image.src = imageUrl;
-            image.alt = "Bot Image";
-            chatLi.appendChild(image);
-        }
+  if (className === "incoming" || className.includes("incoming")) {
+    if (imageUrl) {
+      const image = document.createElement("img");
+      image.src = imageUrl;
+      image.alt = "Bot Image";
+      chatLi.appendChild(image);
     }
-    var formattedMessage = toHyperlink(message);
-    var messageContent = document.createElement("p");
-    messageContent.innerHTML = formattedMessage;
+  }
+  var formattedMessage = toHyperlink(message);
+  var messageContent = document.createElement("p");
+  messageContent.innerHTML = formattedMessage;
 
-    chatLi.appendChild(messageContent);
-    
-    return chatLi;
-}
+  chatLi.appendChild(messageContent);
+
+  return chatLi;
+};
+
 
 const sanitizeUserMessage = (message) => {
     // Replace '<' and '>' characters with their HTML entity equivalents to prevent rendering HTML tags.
@@ -72,63 +80,67 @@ var chatHistory = []; // all of the chat history are stored here
 
 
 const generateResponse = (incomingChatLi) => {
-  // Summoning gpt-3.5-turbo-16k or whatever
-    // https://platform.openai.com/docs/api-reference/chat
-    console.log("Calling gpt-3.5-turbo-16k")
+  const messageElement = incomingChatLi.querySelector("p");
 
-    const messageElement = incomingChatLi.querySelector("p");
-    // var url = "http://localhost:6600/chat";
-    var url = "https://talented-puce-ostrich.cyclic.cloud/chat";
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            pesan: chatHistory
-        })
-    }).then(response => {  
-        return response.json() // after we gave the model time to think, we got the response in json format
-    }).then(data=>{
-        console.log(data.choices[0].message.content) // all the json data are here
-        console.log(data.choices[0].message) // only the message
+  // Summoning gpt-3.5-turbo-16k or whatever
+  // https://platform.openai.com/docs/api-reference/chat
+  console.log("Calling gpt-3.5-turbo-16k");
+
+  // var url = "http://localhost:6600/chat";
+  var url = "https://talented-puce-ostrich.cyclic.cloud/chat";
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      pesan: chatHistory,
+    }),
+  })
+    .then((response) => {
+      return response.json(); // after we gave the model time to think, we got the response in json format
+    })
+    .then((data) => {
+      console.log(data.choices[0].message.content); // all the json data are here
+      console.log(data.choices[0].message); // only the message
+      incomingChatLi.classList.remove("thinking");
       messageElement.textContent = data.choices[0].message.content; // append chatBox ul with new li message from assistant
-        chatBox.scrollTo(0, chatBox.scrollHeight); // scroll down
-        chatHistory.push(data.choices[0].message) // push the previous assistant chat into chatHistory
-    }).catch(error => {
-        console.log('Something bad happened ' + error)
+      chatBox.scrollTo(0, chatBox.scrollHeight); // scroll down
+      chatHistory.push(data.choices[0].message); // push the previous assistant chat into chatHistory
+    })
+    .catch((error) => {
+      console.log("Something bad happened " + error);
     });
 };
 
 const handleChat = () => {
-    // Clean the user input
-    userMessage = chatInput.value.trim(); // removes whitespace from both sides (right and left) of an input string and stored in userMessage var
-    if(!userMessage) return; // if the userMessage contains nothing, nothing will happen
+  // Clean the user input
+  userMessage = chatInput.value.trim(); // removes whitespace from both sides (right and left) of an input string and stored in userMessage var
+  if (!userMessage) return; // if the userMessage contains nothing, nothing will happen
 
-    // Sanitize user input to prevent rendering HTML tags.
-    const sanitizedUserMessage = sanitizeUserMessage(userMessage);
+  // Sanitize user input to prevent rendering HTML tags.
+  const sanitizedUserMessage = sanitizeUserMessage(userMessage);
 
-    //Append user message to chatbox
-    chatBox.appendChild(createChatLi(sanitizedUserMessage, "outgoing")); // append chatBox ul with new li message from user 
-    chatBox.scrollTo(0, chatBox.scrollHeight); // scroll down
+  //Append user message to chatbox
+  chatBox.appendChild(createChatLi(sanitizedUserMessage, "outgoing")); // append chatBox ul with new li message from user
+  chatBox.scrollTo(0, chatBox.scrollHeight); // scroll down
 
-    setTimeout(() => {
+  chatInput.value = ""; // always make sure the input text is empty to type
+
+  setTimeout(() => {
     //Display "Thinking..." message while waiting for the response
-    const incomingChatLi = createChatLi("Thinking...", "incoming")
+    const incomingChatLi = createChatLi("Thinking...", [
+      "incoming",
+      "thinking",
+    ]);
     chatBox.appendChild(incomingChatLi);
-    generateResponse(incomingChatLi)
+    generateResponse(incomingChatLi);
   }, 600);
-    
-    chatHistory.push( {role:'user', content: sanitizedUserMessage} ) // push the previous user chat into chatHistory
 
-    console.log(chatHistory);
+  chatHistory.push({ role: "user", content: sanitizedUserMessage }); // push the previous user chat into chatHistory
 
-    generateResponse()
-    
-    chatInput.value = ""; // always make sure the input text is empty to type
-
-}
-
+  console.log(chatHistory);
+};
 
 
 
